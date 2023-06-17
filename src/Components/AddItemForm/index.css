@@ -1,0 +1,65 @@
+* {
+  box-sizing: border-box;
+}
+.addBookForm label,
+.addBookForm input {
+  display: block;
+  width: 100%;
+}
+.addBookForm .inputField,
+.inputFieldGroup {
+  padding: 20px 0px;
+}
+.inputFieldGroup {
+  display: flex;
+  justify-content: space-between;
+}
+.containerForm {
+  margin: 40px auto 40px auto;
+  padding: 30px;
+  box-shadow: rgb(0 0 0 / 24%) 0px 3px 8px;
+  border-radius: 20px;
+  background-color: white;
+  width: 500px;
+}
+.addBookForm {
+  width: 100%;
+}
+.addBookForm input {
+  border: 2px solid black;
+  padding: 10px;
+}
+.MuiInputBase-root {
+  width: 100%;
+}
+label {
+  padding-bottom: 10px;
+  font-size: 17px;
+  font-weight: bold;
+  text-decoration-color: #df3e3e !important;
+  text-decoration-thickness: 1px !important;
+  text-decoration: underline;
+  text-underline-offset: 3px !important;
+}
+.MuiInput-underline:after {
+  border-bottom: 2px solid #000000 !important;
+  transform: none !important;
+}
+.PrivateSwitchBase-root-1 {
+  padding: 10px 0px !important;
+}
+.errorTags {
+  font-size: 13px;
+  color: red;
+  padding-top: 5px;
+}
+.uploaded-image {
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
+  margin-top: 20px;
+}
+.required-sign {
+  color: #df3e3e;
+  font-size: 15px;
+}

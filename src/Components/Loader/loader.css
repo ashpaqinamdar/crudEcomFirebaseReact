@@ -1,0 +1,14 @@
+.loader-center {
+  display: flex;
+  align-items: center;
+  justify-self: center;
+  text-align: center;
+  margin-top: 250px;
+}
+.oval-loading {
+  display: block !important;
+}
+.loader {
+  display: block !important;
+  width: 100%;
+}
