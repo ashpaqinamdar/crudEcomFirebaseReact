@@ -97,8 +97,6 @@ function HomePage() {
     setItems(Items);
   };
 
-  console.log("test", items);
-
   return (
     <div>
       <div className="navbar">
