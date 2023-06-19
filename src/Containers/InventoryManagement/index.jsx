@@ -103,7 +103,7 @@ function InventoryManangement() {
           </div>
         </div>
       </div>
-      <div style={{ margin: "0px 50px" }}>
+      <div style={{ margin: "100px 40px 0px 40px" }}>
         {loading ? (
           <div className="loader-center">
             <LoadingState Width={100} Height={100} />
