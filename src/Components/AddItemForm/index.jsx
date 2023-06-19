@@ -13,7 +13,7 @@ import { AiOutlineCloseCircle } from "react-icons/ai";
 function AddItemForm({
   itemInfo,
   category,
-  type,
+  status,
   onChange,
   handleChangeType,
   handleSubmit,
@@ -27,7 +27,7 @@ function AddItemForm({
 }) {
   const navigate = useHistory();
   const navigateToHome = () => {
-    navigate.push("/");
+    navigate.push("/inventory-management");
   };
   console.log("sdada", view);
   return (
@@ -79,24 +79,31 @@ function AddItemForm({
             )}
           </div>
 
-          <div className="inputFieldGroup">
-            {type.map((item, index) => (
-              <div key={index}>
-                <label htmlFor="type">{item.name}</label>
-                <Checkbox
-                  checked={item.checked}
-                  onChange={() => handleChangeType(item.name)}
-                  inputProps={{ "aria-label": "primary checkbox" }}
-                  name="type"
-                />
+          <div className="inputField">
+            <label htmlFor="genre">
+              Status<span className="required-sign">*</span>
+            </label>
+            <Select
+              labelId="demo-simple-select-label"
+              id="demo-simple-select"
+              name="status"
+              onChange={(e) => onChange(e)}
+              value={itemInfo.status}
+              placeholder="Enter Item Category"
+            >
+              {status.map((item) => (
+                <MenuItem value={item.status} key={item.id}>
+                  {item.status}
+                </MenuItem>
+              ))}
+            </Select>
+            {error.statusError && (
+              <div className="errorTags">
+                Please select a status<span className="required-sign">*</span>
               </div>
-            ))}
+            )}
           </div>
-          {error.typeError && (
-            <div style={{ marginTop: "-25px" }} className="errorTags">
-              Please check atleast one option
-            </div>
-          )}
+
           <div className="inputField">
             <label htmlFor="price">
               Price (₹)<span className="required-sign">*</span>

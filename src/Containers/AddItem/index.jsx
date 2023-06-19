@@ -1,10 +1,20 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import AddItemForm from "../../Components/AddItemForm";
 import Axios from "axios";
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 import "react-toastify/dist/ReactToastify.css";
 import { toast } from "react-toastify";
 import { editBook, addBook } from "../../URL";
+import { db } from "../../utils/firebase";
+import {
+  collection,
+  addDoc,
+  Timestamp,
+  getDocs,
+  deleteDoc,
+  updateDoc,
+  doc,
+} from "firebase/firestore";
 
 const category = [
   { category: "Fashion", id: 1 },
@@ -16,25 +26,34 @@ const category = [
   { category: "Other", id: 7 },
 ];
 
+const status = [
+  { status: "In stock", id: 1 },
+  { status: "Out of stock", id: 2 },
+];
+
 function AddItem(props) {
+  console.log("props", props);
   const [itemInfo, setItemInfo] = useState({
-    itemName: props.location?.state?.data?.itemName
-      ? props.location?.state?.data?.itemName
+    itemName: props.location?.state?.data?.item?.itemName
+      ? props.location?.state?.data?.item?.itemName
       : "",
-    category: props.location?.state?.data?.category
-      ? props.location?.state?.data?.category
+    category: props.location?.state?.data?.item?.category
+      ? props.location?.state?.data?.item?.category
       : "",
-    price: props.location?.state?.data?.price
-      ? props.location?.state?.data?.price
+    price: props.location?.state?.data?.item?.price
+      ? props.location?.state?.data?.item?.price
       : "",
     id: props.location?.state?.data?._id
       ? props.location?.state?.data?._id
       : "",
+    status: props.location?.state?.data?.item?.status
+      ? props.location?.state?.data?.item?.status
+      : "",
   });
   const [loading, setLoading] = useState(false);
   const [imageBase64, setImageBase64] = useState(
-    props.location?.state?.data?.coverImage
-      ? props.location?.state?.data?.coverImage
+    props.location?.state?.data?.item?.image
+      ? props.location?.state?.data?.item?.image
       : ""
   );
   const [error, setError] = useState({
@@ -42,6 +61,7 @@ function AddItem(props) {
     categoryError: false,
     priceError: false,
     typeError: false,
+    statusError: false,
   });
   const navigate = useHistory();
   const [type, setType] = useState([
@@ -83,7 +103,7 @@ function AddItem(props) {
     setItemInfo(bookValue);
   };
 
-  const handleSubmit = (id) => {
+  const handleSubmit = async (id) => {
     let validate = { ...error };
     let pass = true;
     const re = /^[0-9\b]+$/;
@@ -100,6 +120,12 @@ function AddItem(props) {
     } else {
       validate.categoryError = false;
     }
+    if (!itemInfo.status) {
+      validate.statusError = true;
+      pass = false;
+    } else {
+      validate.statusError = false;
+    }
     if (!itemInfo.price) {
       validate.priceError = true;
       pass = false;
@@ -108,17 +134,6 @@ function AddItem(props) {
       pass = false;
     } else {
       validate.priceError = false;
-    }
-
-    const valid = type.some(checked);
-    function checked(item) {
-      return item.checked === true;
-    }
-    if (!valid) {
-      validate.typeError = true;
-      pass = false;
-    } else {
-      validate.typeError = false;
     }
 
     setError(validate);
@@ -131,49 +146,40 @@ function AddItem(props) {
     if (pass) {
       setLoading(true);
       if (props.location?.state?.edit) {
-        Axios.put(editBook, {
+        const docRef = doc(db, "items", props.location?.state?.data?.id);
+        let data = {
           itemName: itemInfo.itemName,
           category: itemInfo.category,
           price: itemInfo.price,
-          hardBound: typeToSend.Hardbound,
-          pdf: typeToSend.PDF,
-          paperBack: typeToSend.PaperBack,
-          id: id,
-          coverImage: imageBase64 ? imageBase64 : "",
-        })
-          .then(() => {
-            navigate.push({
-              pathname: "/",
-            });
-            toast("Book updated successfully");
-          })
-          .catch((e) => {
-            console.log("errr", e);
-            toast("failed to update book");
+          status: itemInfo.status,
+          image: imageBase64,
+          updated: Timestamp.now(),
+        };
+        updateDoc(docRef, data)
+          .then((docRef) => {
+            navigate.push("/inventory-management");
             setLoading(false);
-            return "";
+          })
+          .catch((error) => {
+            console.log(error);
           });
       } else {
-        Axios.post(addBook, {
+        const dbRef = collection(db, "items");
+        let data = {
           itemName: itemInfo.itemName,
           category: itemInfo.category,
           price: itemInfo.price,
-          hardBound: typeToSend.Hardbound,
-          pdf: typeToSend.PDF,
-          paperBack: typeToSend.PaperBack,
-          coverImage: imageBase64 ? imageBase64 : "",
-        })
-          .then(() => {
-            navigate.push({
-              pathname: "/",
-            });
-            toast("Book added successfully");
-          })
-          .catch((e) => {
-            console.log("errr", e);
-            toast("failed to add book");
+          status: itemInfo.status,
+          image: imageBase64,
+          created: Timestamp.now(),
+        };
+        addDoc(dbRef, data)
+          .then((docRef) => {
             setLoading(false);
-            return "";
+            navigate.push("/inventory-management");
+          })
+          .catch((error) => {
+            console.log(error);
           });
       }
     }
@@ -216,7 +222,7 @@ function AddItem(props) {
     <div>
       <AddItemForm
         category={category}
-        type={type}
+        status={status}
         itemInfo={itemInfo}
         onChange={(e) => handleOnChange(e)}
         handleChangeType={(e) => handleChangeType(e)}
